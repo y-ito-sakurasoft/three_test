@@ -97,11 +97,15 @@ function init() {
     scene.add(ambLight);
 
     // Controls
-    controls = new THREE.FlyControls(camera, canvas);
-    controls.autoForward = false;
-    controls.dragToLook = true;
-    controls.rollSpeed = Math.PI / 12;
-    controls.movementSpeed = 0.5;
+    //var controls = new THREE.FlyControls(camera, canvas);
+    //controls.autoForward = false;
+    //controls.dragToLook = true;
+    //controls.rollSpeed = Math.PI / 12;
+    //controls.movementSpeed = 0.5;
+
+    // Orbit Controls
+    const controls = new THREE.OrbitControls(camera);
+    controls.target.set(0, 0, 0);
 
     // GUI
     var gui = new dat.GUI();
@@ -116,7 +120,7 @@ function init() {
     function tick() {
         var delta = clock.getDelta();
 
-        controls.update(delta);
+        controls.update();
         mesh.rotation.y += delta * 0.2;
 
         //renderer.render(scene, camera);
