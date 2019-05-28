@@ -46,8 +46,8 @@ function init() {
         //let effectBloom = new THREE.BloomPass(0.6, 25, 10.0, 512);
         //composer.addPass(effectBloom);
 
-        //var filmPass = new THREE.FilmPass(0.8, 0.325, 256, false);
-        //composer.addPass(filmPass);
+        var filmPass = new THREE.FilmPass(0.8, 0.325, 256, false);
+        composer.addPass(filmPass);
 
         //let tone = new THREE.AdaptiveToneMappingPass(true, 256);
         //composer.addPass(tone);
