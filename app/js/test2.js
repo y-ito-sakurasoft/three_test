@@ -54,7 +54,7 @@ function init() {
             cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse( camera.projectionMatrix ) }
         },
         vertexShader: ReadAsText('shaders/none.vert.glsl'),
-        fragmentShader: ReadAsText('shaders/raytrace.flag.glsl'),
+        fragmentShader: ReadAsText('shaders/raymarching.flag.glsl'),
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.frustumCulled = false;

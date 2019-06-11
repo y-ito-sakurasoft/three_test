@@ -6,6 +6,7 @@ window.addEventListener('mousemove', onMouseMove);
 var renderer;
 var scene;
 var camera;
+var composer;
 var dirLight;
 
 var clock = new THREE.Clock();
@@ -35,15 +36,19 @@ function init() {
     camera.position.set(0, 1, 3);
 
     // Composer
-    let composer = new THREE.EffectComposer(renderer);
+    composer = new THREE.EffectComposer(renderer);
     {
         var renderPass = new THREE.RenderPass(scene, camera);
         composer.addPass(renderPass);
 
         //var unrealBloomPass = new THREE.UnrealBloomPass(new THREE.Vector2( 256, 256 ), 1.5, 1.0, 0.3);
         //composer.addPass(unrealBloomPass);
-    
-        let effectBloom = new THREE.BloomPass(0.5, 25, 10.0, 512);
+
+        var ssaoPass = new THREE.SSAOPass(scene, camera, width, height);
+        ssaoPass.output = THREE.SSAOPass.OUTPUT.Default;
+        composer.addPass(ssaoPass);
+
+        var effectBloom = new THREE.BloomPass(0.5, 25, 10.0, 512);
         composer.addPass(effectBloom);
 
         //var filmPass = new THREE.FilmPass(0.8, 0.325, 256, false);
@@ -103,14 +108,7 @@ function init() {
                         object.material[i] = material;
                     }
                 } else {
-                    //var material = new THREE.MeshBasicMaterial();
-                    //THREE.Material.prototype.copy.call(material, object.material);
-                    //material.color.copy(object.material.color);
-                    //material.map = object.material.map;
-                    //material.lights = false;
-                    //material.skinning = object.material.skinning;
-                    //material.morphTargets = object.material.morphTargets;
-                    //material.morphNormals = object.material.morphNormals;
+                    
                     var material = new THREE.MeshStandardMaterial();
                     material.color.copy(object.material.color);
                     material.map = object.material.map;
@@ -137,6 +135,21 @@ function init() {
     li.add(directionalLight.position, 'x', -1, 1).listen();
     li.add(directionalLight.position, 'y', -1, 1).listen();
     li.add(directionalLight.position, 'z', -1, 1).listen();
+
+    var ssaoGui = gui.addFolder('SSAO');
+    ssaoGui.add( ssaoPass, 'output', {
+        'Default': THREE.SSAOPass.OUTPUT.Default,
+        'SSAO Only': THREE.SSAOPass.OUTPUT.SSAO,
+        'SSAO Only + Blur': THREE.SSAOPass.OUTPUT.Blur,
+        'Beauty': THREE.SSAOPass.OUTPUT.Beauty,
+        'Depth': THREE.SSAOPass.OUTPUT.Depth,
+        'Normal': THREE.SSAOPass.OUTPUT.Normal
+    } ).onChange( function ( value ) {
+        ssaoPass.output = parseInt( value );
+    } );
+    ssaoGui.add( ssaoPass, 'kernelRadius' ).min( 0 ).max( 32 );
+    ssaoGui.add( ssaoPass, 'minDistance' ).min( 0.0001 ).max( 0.02 );
+    ssaoGui.add( ssaoPass, 'maxDistance' ).min( 0.001 ).max( 0.3 );
 
     //var ub = gui.addFolder('Unreal Bloom');
     //ub.add(unrealBloomPass, 'strength', 0, 3).listen();
@@ -165,6 +178,7 @@ function onResize() {
     // レンダラーのサイズを調整する
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
+    composer.setSize(width, height);
 
     // カメラのアスペクト比を正す
     camera.aspect = width / height;
