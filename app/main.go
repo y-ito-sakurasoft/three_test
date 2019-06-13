@@ -19,12 +19,17 @@ func test3Handler(w http.ResponseWriter, r *http.Request) {
 	util.Templates(w, "test3.html", nil)
 }
 
+func test4Handler(w http.ResponseWriter, r *http.Request) {
+	util.Templates(w, "test4.html", nil)
+}
+
 func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", rootHandler)
 	r.HandleFunc("/test2", test2Handler)
 	r.HandleFunc("/test3", test3Handler)
+	r.HandleFunc("/test4", test4Handler)
 
 	http.Handle("/", r)
 	http.Handle("/js/", http.FileServer(http.Dir("./")))

@@ -44,9 +44,9 @@ function init() {
         //var unrealBloomPass = new THREE.UnrealBloomPass(new THREE.Vector2( 256, 256 ), 1.5, 1.0, 0.3);
         //composer.addPass(unrealBloomPass);
 
-        var ssaoPass = new THREE.SSAOPass(scene, camera, width, height);
-        ssaoPass.output = THREE.SSAOPass.OUTPUT.Default;
-        composer.addPass(ssaoPass);
+        //var ssaoPass = new THREE.SSAOPass(scene, camera, width, height);
+        //ssaoPass.output = THREE.SSAOPass.OUTPUT.Default;
+        //composer.addPass(ssaoPass);
 
         var effectBloom = new THREE.BloomPass(0.5, 25, 10.0, 512);
         composer.addPass(effectBloom);
@@ -89,39 +89,8 @@ function init() {
     scene.add(ambLight);
 
     // VRM model
-    var loader = new THREE.VRMLoader();
-    loader.load( 'models/VRM/AliciaSolid.vrm', function ( vrm ) {
-        // VRMLoader doesn't support VRM Unlit extension yet so
-        // converting all materials to MeshBasicMaterial here as workaround so far.
-        vrm.scene.traverse(function (object) {
-            if (object.material) {
-                if (Array.isArray(object.material)) {
-                    for (var i = 0, il = object.material.length; i < il; i++) {
-                        var material = new THREE.MeshBasicMaterial();
-                        THREE.Material.prototype.copy.call(material, object.material[i]);
-                        material.color.copy(object.material[i].color);
-                        material.map = object.material[i].map;
-                        material.lights = false;
-                        material.skinning = object.material[i].skinning;
-                        material.morphTargets = object.material[i].morphTargets;
-                        material.morphNormals = object.material[i].morphNormals;
-                        object.material[i] = material;
-                    }
-                } else {
-                    
-                    var material = new THREE.MeshStandardMaterial();
-                    material.color.copy(object.material.color);
-                    material.map = object.material.map;
-                    material.roughness = 0.9;
-                    material.envMap = cubemap;
-                    material.skinning = object.material.skinning;
-                    material.morphTargets = object.material.morphTargets;
-                    material.morphNormals = object.material.morphNormals;
-                    object.material = material;
-                }
-            }
-        });
-        scene.add(vrm.scene);
+    LoadVRMModelStandard('models/VRM/AliciaSolid.vrm', cubemap, function(model) {
+        scene.add(model);
     });
 
     // Orbit Controls
@@ -136,20 +105,22 @@ function init() {
     li.add(directionalLight.position, 'y', -1, 1).listen();
     li.add(directionalLight.position, 'z', -1, 1).listen();
 
-    var ssaoGui = gui.addFolder('SSAO');
-    ssaoGui.add( ssaoPass, 'output', {
-        'Default': THREE.SSAOPass.OUTPUT.Default,
-        'SSAO Only': THREE.SSAOPass.OUTPUT.SSAO,
-        'SSAO Only + Blur': THREE.SSAOPass.OUTPUT.Blur,
-        'Beauty': THREE.SSAOPass.OUTPUT.Beauty,
-        'Depth': THREE.SSAOPass.OUTPUT.Depth,
-        'Normal': THREE.SSAOPass.OUTPUT.Normal
-    } ).onChange( function ( value ) {
-        ssaoPass.output = parseInt( value );
-    } );
-    ssaoGui.add( ssaoPass, 'kernelRadius' ).min( 0 ).max( 32 );
-    ssaoGui.add( ssaoPass, 'minDistance' ).min( 0.0001 ).max( 0.02 );
-    ssaoGui.add( ssaoPass, 'maxDistance' ).min( 0.001 ).max( 0.3 );
+    gui.add(ambLight, 'intensity', 0, 3).listen();
+
+    // var ssaoGui = gui.addFolder('SSAO');
+    // ssaoGui.add( ssaoPass, 'output', {
+    //     'Default': THREE.SSAOPass.OUTPUT.Default,
+    //     'SSAO Only': THREE.SSAOPass.OUTPUT.SSAO,
+    //     'SSAO Only + Blur': THREE.SSAOPass.OUTPUT.Blur,
+    //     'Beauty': THREE.SSAOPass.OUTPUT.Beauty,
+    //     'Depth': THREE.SSAOPass.OUTPUT.Depth,
+    //     'Normal': THREE.SSAOPass.OUTPUT.Normal
+    // } ).onChange( function ( value ) {
+    //     ssaoPass.output = parseInt( value );
+    // } );
+    // ssaoGui.add( ssaoPass, 'kernelRadius' ).min( 0 ).max( 32 );
+    // ssaoGui.add( ssaoPass, 'minDistance' ).min( 0.0001 ).max( 0.02 );
+    // ssaoGui.add( ssaoPass, 'maxDistance' ).min( 0.001 ).max( 0.3 );
 
     //var ub = gui.addFolder('Unreal Bloom');
     //ub.add(unrealBloomPass, 'strength', 0, 3).listen();
